@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inventory')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+
+    <main class="main">
+        <header class="page-head">
+            <div>
+                <h1>Inventory</h1>
+                <p class="lead">Stock levels for printed books and e-book licenses.</p>
+            </div>
+            <a th:href="@{/inventory/new}" class="btn btn-primary">Add stock item</a>
+        </header>
+
+        <div th:replace="~{fragments/layout :: flash}"></div>
+
+        <section class="stat-row" aria-label="Inventory totals">
+            <div class="stat">
+                <span class="stat-value" th:text="${summary.totalItems}">0</span>
+                <span class="stat-label">Stock items</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" th:text="${summary.totalUnits}">0</span>
+                <span class="stat-label">Units on hand</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value"
+                      th:text="'Rs. ' + ${#numbers.formatDecimal(summary.totalValue, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</span>
+                <span class="stat-label">Stock value</span>
+            </div>
+            <div class="stat" th:classappend="${summary.needReorderCount > 0} ? 'stat-warn'">
+                <span class="stat-value" th:text="${summary.needReorderCount}">0</span>
+                <span class="stat-label">Need reorder</span>
+            </div>
+        </section>
+
+        <form th:action="@{/inventory}" method="get" class="filters" role="search">
+            <div class="field grow">
+                <label for="q">Search</label>
+                <input type="search" id="q" name="q" th:value="${q}" placeholder="Title, ISBN or item ID">
+            </div>
+            <div class="field">
+                <label for="type">Type</label>
+                <select id="type" name="type">
+                    <option value="">All types</option>
+                    <option value="PRINTED" th:selected="${type == 'PRINTED'}">Printed book</option>
+                    <option value="EBOOK" th:selected="${type == 'EBOOK'}">E-book</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="">All statuses</option>
+                    <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.label}"
+                            th:selected="${status == s.name()}">In stock</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-secondary">Search</button>
+                <a th:if="${filtered}" th:href="@{/inventory}" class="link">Clear</a>
+            </div>
+        </form>
+
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Book</th>
+                    <th scope="col">Type</th>
+                    <th scope="col" class="num">On hand</th>
+                    <th scope="col" class="num">Reorder at</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="num">Value (Rs.)</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td class="mono" th:text="${item.itemId}">INV001</td>
+                    <td>
+                        <a th:href="@{/inventory/{id}(id=${item.itemId})}" class="row-title" th:text="${item.bookTitle}">Title</a>
+                        <span class="muted" th:text="${item.isbn}">ISBN</span>
+                    </td>
+                    <td th:text="${item.typeLabel}">Printed book</td>
+                    <td class="num" th:text="${item.quantity}">0</td>
+                    <td class="num" th:text="${item.reorderLevel}">0</td>
+                    <td><span th:replace="~{fragments/layout :: status(${item})}"></span></td>
+                    <td class="num" th:text="${#numbers.formatDecimal(item.calculateStockValue(), 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                    <td class="row-actions">
+                        <a th:href="@{/inventory/{id}/edit(id=${item.itemId})}" class="link">Edit</a>
+                        <form th:action="@{/inventory/{id}/delete(id=${item.itemId})}" method="post"
+                              class="inline-form" data-confirm="Delete this stock item? This can't be undone.">
+                            <button type="submit" class="link link-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(items)}">
+                    <td colspan="8" class="empty">
+                        <span th:if="${filtered}">No stock matches that search. Try a different title or clear the filters.</span>
+                        <span th:unless="${filtered}">No stock yet. Add your first item to start tracking inventory.</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

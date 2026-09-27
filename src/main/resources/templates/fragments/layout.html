@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' | Online Bookstore'">Online Bookstore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<aside th:fragment="sidebar" class="sidebar">
+    <a th:href="@{/}" class="brand">
+        <span class="brand-mark" aria-hidden="true">B</span>
+        <span>
+            <strong>Sarasavi Bookstore</strong>
+            <small>Management System</small>
+        </span>
+    </a>
+    <nav class="nav" aria-label="Modules">
+        <a th:href="@{/}" th:classappend="${active == 'dashboard'} ? 'is-active'">Dashboard</a>
+        <a th:each="m : ${modules}"
+           th:href="@{${m.url}}"
+           th:classappend="${active == m.key} ? 'is-active'">
+            <span th:text="${m.name}">Module</span>
+        </a>
+    </nav>
+</aside>
+
+<div th:fragment="flash" class="flash-area">
+    <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}">Saved.</div>
+    <div th:if="${error}" class="alert alert-error" role="alert" th:text="${error}">Error.</div>
+</div>
+
+<span th:fragment="status(item)"
+      class="badge"
+      th:classappend="'badge-' + ${item.stockStatus.cssClass}"
+      th:text="${item.stockStatus.label}">In stock</span>
+
+</body>
+</html>

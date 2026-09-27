@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${editMode} ? 'Edit stock item' : 'Add stock item')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+
+    <main class="main">
+        <nav class="crumbs" aria-label="Breadcrumb">
+            <a th:href="@{/inventory}">Inventory</a>
+            <span aria-hidden="true">/</span>
+            <span th:text="${editMode} ? 'Edit ' + ${itemId} : 'Add stock item'">Add stock item</span>
+        </nav>
+
+        <header class="page-head">
+            <div>
+                <h1 th:text="${editMode} ? 'Edit stock item' : 'Add stock item'">Add stock item</h1>
+                <p class="lead" th:text="${editMode} ? 'Update details for ' + ${itemId} + '. To add or remove units, use Adjust stock on the item page.' : 'Record a printed book or an e-book license you hold in stock.'">Lead</p>
+            </div>
+        </header>
+
+        <form th:object="${form}"
+              th:action="${editMode} ? @{/inventory/{id}/edit(id=${itemId})} : @{/inventory}"
+              method="post" class="panel form" novalidate>
+
+            <fieldset class="form-section">
+                <legend>Stock type</legend>
+                <div th:if="${!editMode}" class="type-choice">
+                    <label class="choice">
+                        <input type="radio" th:field="*{itemType}" value="PRINTED">
+                        <span><strong>Printed book</strong><small>Physical copies on a warehouse shelf</small></span>
+                    </label>
+                    <label class="choice">
+                        <input type="radio" th:field="*{itemType}" value="EBOOK">
+                        <span><strong>E-book</strong><small>Resale licenses on a digital platform</small></span>
+                    </label>
+                </div>
+                <div th:if="${editMode}">
+                    <input type="hidden" name="itemType" th:value="*{itemType}">
+                    <p class="static-value" th:text="*{itemType == 'EBOOK'} ? 'E-book' : 'Printed book'">Printed book</p>
+                    <p class="hint">The type can't be changed. Delete the item and add it again if it's wrong.</p>
+                </div>
+                <p class="field-error" th:if="${#fields.hasErrors('itemType')}" th:errors="*{itemType}">Error</p>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Book</legend>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="isbn">ISBN</label>
+                        <input type="text" id="isbn" th:field="*{isbn}" th:errorclass="has-error"
+                               placeholder="978-0-13-468599-1" autocomplete="off">
+                        <p class="field-error" th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}">Error</p>
+                    </div>
+                    <div class="field">
+                        <label for="bookTitle">Title</label>
+                        <input type="text" id="bookTitle" th:field="*{bookTitle}" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('bookTitle')}" th:errors="*{bookTitle}">Error</p>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section">
+                <legend>Stock level and cost</legend>
+                <div class="grid-3">
+                    <div class="field">
+                        <label for="quantity">Quantity on hand</label>
+                        <input type="number" id="quantity" th:field="*{quantity}" min="0" step="1" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">Error</p>
+                    </div>
+                    <div class="field">
+                        <label for="reorderLevel">Reorder level</label>
+                        <input type="number" id="reorderLevel" th:field="*{reorderLevel}" min="0" step="1" th:errorclass="has-error">
+                        <p class="hint">Flag as low stock at or below this number.</p>
+                        <p class="field-error" th:if="${#fields.hasErrors('reorderLevel')}" th:errors="*{reorderLevel}">Error</p>
+                    </div>
+                    <div class="field">
+                        <label for="unitCost">Unit cost (Rs.)</label>
+                        <input type="number" id="unitCost" th:field="*{unitCost}" min="0" step="0.01" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('unitCost')}" th:errors="*{unitCost}">Error</p>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section" data-type-section="PRINTED">
+                <legend>Warehouse location</legend>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="warehouse">Warehouse</label>
+                        <input type="text" id="warehouse" th:field="*{warehouse}" placeholder="Warehouse A" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('warehouse')}" th:errors="*{warehouse}">Error</p>
+                    </div>
+                    <div class="field">
+                        <label for="shelfCode">Shelf code</label>
+                        <input type="text" id="shelfCode" th:field="*{shelfCode}" placeholder="A-03" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('shelfCode')}" th:errors="*{shelfCode}">Error</p>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="form-section" data-type-section="EBOOK">
+                <legend>License</legend>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="platform">Platform</label>
+                        <input type="text" id="platform" th:field="*{platform}" placeholder="Kindle Store" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('platform')}" th:errors="*{platform}">Error</p>
+                    </div>
+                    <div class="field">
+                        <label for="licenseExpiry">License expires on</label>
+                        <input type="date" id="licenseExpiry" th:field="*{licenseExpiry}" th:errorclass="has-error">
+                        <p class="field-error" th:if="${#fields.hasErrors('licenseExpiry')}" th:errors="*{licenseExpiry}">Error</p>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" th:text="${editMode} ? 'Save changes' : 'Add stock item'">Save</button>
+                <a th:href="${editMode} ? @{/inventory/{id}(id=${itemId})} : @{/inventory}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
