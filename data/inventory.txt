@@ -1,0 +1,8 @@
+# itemType|itemId|isbn|bookTitle|quantity|reorderLevel|unitCost|lastUpdated|warehouse-or-platform|shelfCode-or-licenseExpiry
+PRINTED|INV001|978-0-13-468599-1|Effective Java|24|10|4850.00|2026-09-20|Warehouse A|A-03
+PRINTED|INV002|978-0-596-00712-6|Head First Design Patterns|6|8|5200.00|2026-09-18|Warehouse A|A-07
+PRINTED|INV003|978-1-61729-757-1|Spring in Action|0|5|6100.00|2026-09-10|Warehouse B|B-02
+PRINTED|INV004|978-0-13-235088-4|Clean Code|35|12|4400.00|2026-09-22|Warehouse B|B-11
+EBOOK|INV005|978-0-13-235088-4|Clean Code|15|5|3200.00|2026-09-15|Kindle Store|2027-06-30
+EBOOK|INV006|978-0-13-595705-9|The Pragmatic Programmer|5|5|3900.00|2026-09-27|Google Play Books|2026-10-15
+PRINTED|INV008|978-0-13-468599-7|madol duwa|18|7|345.91|2026-09-26|666|66
