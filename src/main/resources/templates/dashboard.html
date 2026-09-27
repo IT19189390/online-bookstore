@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: sidebar}"></aside>
+
+    <main class="main">
+        <header class="page-head">
+            <div>
+                <h1>Dashboard</h1>
+                <p class="lead">Pick a module to manage the bookstore.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: flash}"></div>
+
+        <section class="module-grid" aria-label="Modules">
+            <a th:each="m : ${modules}" th:href="@{${m.url}}" class="module-tile"
+               th:classappend="${m.implemented} ? 'is-ready' : 'is-pending'">
+                <h2 th:text="${m.name}">Module</h2>
+                <p th:text="${m.description}">Description</p>
+                <span class="tile-state" >Open</span>
+            </a>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Stock that needs attention</h2>
+                <a th:href="@{/inventory(status='LOW_STOCK')}" class="link">See all low stock</a>
+            </div>
+
+            <div class="stat-row">
+                <div class="stat">
+                    <span class="stat-value" th:text="${summary.totalItems}">0</span>
+                    <span class="stat-label">Stock items</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" th:text="${summary.needReorderCount}">0</span>
+                    <span class="stat-label">Need reorder</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" th:text="${summary.outOfStockCount}">0</span>
+                    <span class="stat-label">Out of stock</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value"
+                          th:text="'Rs. ' + ${#numbers.formatDecimal(summary.totalValue, 1, 'COMMA', 2, 'POINT')}">Rs. 0.00</span>
+                    <span class="stat-label">Stock value</span>
+                </div>
+            </div>
+
+            <div class="table-wrap" th:unless="${#lists.isEmpty(attentionItems)}">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Book</th>
+                        <th scope="col">Type</th>
+                        <th scope="col" class="num">On hand</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="num">Suggested reorder</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="item : ${attentionItems}">
+                        <td>
+                            <a th:href="@{/inventory/{id}(id=${item.itemId})}" class="row-title" th:text="${item.bookTitle}">Title</a>
+                            <span class="muted" th:text="${item.itemId}">INV001</span>
+                        </td>
+                        <td th:text="${item.typeLabel}">Printed book</td>
+                        <td class="num" th:text="${item.quantity}">0</td>
+                        <td><span th:replace="~{fragments/layout :: status(${item})}"></span></td>
+                        <td class="num" th:text="${item.suggestedReorderQuantity}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p th:if="${#lists.isEmpty(attentionItems)}" class="empty">All stock is above its reorder level.</p>
+        </section>
+    </main>
+</div>
+</body>
+</html>
